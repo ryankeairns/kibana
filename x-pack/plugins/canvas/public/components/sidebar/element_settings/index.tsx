@@ -8,10 +8,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // @ts-ignore
 import { getElementById, getSelectedPage } from '../../../state/selectors/workpad';
-import { ElementSettings as Component, Element } from './element_settings';
+import { ElementSettings as Component } from './element_settings';
+import { PositionedElement } from '../../../lib/positioned_element';
 
 export interface State {
-  persistent: { workpad: { pages: Array<{ elements: Element[] }> } };
+  persistent: { workpad: { pages: Array<{ elements: PositionedElement[] }> } };
 }
 
 export interface Props {

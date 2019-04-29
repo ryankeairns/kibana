@@ -9,27 +9,27 @@ import React, { PureComponent } from 'react';
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import {
+  EuiButton,
+  EuiButtonEmpty,
+  // @ts-ignore hasn't been converted to TypeScript yet
+  EuiCard,
+  EuiFieldText,
+  // @ts-ignore hasn't been converted to TypeScript yet
+  EuiFilePicker,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFormRow,
+  EuiIcon,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
-  EuiOverlayMask,
-  EuiFormRow,
-  EuiFieldText,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButton,
-  EuiButtonEmpty,
-  EuiSpacer,
-  EuiTextArea,
-  EuiText,
-  EuiTitle,
-  EuiModalHeaderTitle,
   EuiModalHeader,
-  EuiIcon,
-  // @ts-ignore hasn't been converted to TypeScript yet
-  EuiCard,
-  // @ts-ignore hasn't been converted to TypeScript yet
-  EuiFilePicker,
+  EuiModalHeaderTitle,
+  EuiOverlayMask,
+  EuiSpacer,
+  EuiText,
+  EuiTextArea,
+  EuiTitle,
 } from '@elastic/eui';
 import { VALID_IMAGE_TYPES } from '../../../common/lib/constants';
 import { encode } from '../../../common/lib/dataurl';
@@ -57,7 +57,7 @@ export interface Props {
   /**
    * A click handler for the save button
    */
-  onSave: (name: string, description?: string, image?: string) => void;
+  onSave: (name: string, description?: string, image?: string | null) => void;
   /**
    * A click handler for the cancel button
    */
@@ -75,8 +75,8 @@ export class CustomElementModal extends PureComponent<Props> {
   };
 
   public state = {
-    name: this.props.name || null,
-    description: this.props.description || null,
+    name: this.props.name || '',
+    description: this.props.description || '',
     image: this.props.image || null,
   };
 

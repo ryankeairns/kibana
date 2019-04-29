@@ -54,8 +54,6 @@ export interface Props {
 // handlers for clone and delete
 export const basicHandlerCreators = {
   cloneNodes: ({ insertNodes, pageId, selectToplevelNodes, selectedNodes }: Props) => (): void => {
-    // TODO: This is slightly different from the duplicateNodes function in sidebar/index.js. Should they be doing the same thing?
-    // This should also be abstracted.
     const clonedNodes = selectedNodes && cloneSubgraphs(selectedNodes);
     if (clonedNodes) {
       insertNodes(clonedNodes, pageId);
@@ -63,7 +61,6 @@ export const basicHandlerCreators = {
     }
   },
   deleteNodes: ({ pageId, removeNodes, selectedNodes }: Props) => (): void => {
-    // currently, handle the removal of one node, exploiting multiselect subsequently
     if (selectedNodes.length) {
       removeNodes(selectedNodes.map(extractId), pageId);
     }
@@ -80,7 +77,7 @@ export const basicHandlerCreators = {
         name: camelCase(name),
         displayName: name,
         help: description,
-        image, // TODO: store a snapshot of the rendered element (how?...)
+        image,
         content,
       };
       customElementService
