@@ -13,38 +13,13 @@ import { Datasource } from '../../datasource';
 import { FunctionFormList } from '../../function_form_list';
 // @ts-ignore
 import { SidebarHeader } from '../../sidebar_header';
-
-export interface Element {
-  /**
-   * a Canvas element used to populate config forms
-   */
-  id: string;
-  /**
-   * layout engine settings
-   */
-  position: {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-    angle: number;
-    parent: number | null;
-  };
-  /**
-   * Canvas expression used to generate the element
-   */
-  expression: string;
-  /**
-   * AST of the Canvas expression for the element
-   */
-  ast: any;
-}
+import { PositionedElement } from '../../../lib/positioned_element';
 
 export interface Props {
   /**
    * a Canvas element used to populate config forms
    */
-  element: Element;
+  element: PositionedElement;
 }
 export const ElementSettings: FunctionComponent<Props> = ({ element }) => {
   const tabs = [

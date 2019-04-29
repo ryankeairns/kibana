@@ -16,34 +16,9 @@ import { notify } from './notify';
 import * as customElementService from './custom_element_service';
 // @ts-ignore
 import { getId } from './get_id';
+import { PositionedElement } from './positioned_element';
 
 const extractId = (node: { id: string }): string => node.id;
-
-interface Element {
-  /**
-   * a Canvas element used to populate config forms
-   */
-  id: string;
-  /**
-   * layout engine settings
-   */
-  position: {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-    angle: number;
-    parent: number | null;
-  };
-  /**
-   * Canvas expression used to generate the element
-   */
-  expression: string;
-  /**
-   * AST of the Canvas expression for the element
-   */
-  ast: any;
-}
 
 export interface Props {
   /**
@@ -51,13 +26,13 @@ export interface Props {
    */
   pageId: string;
   /**
-   * array of selected Element objects
+   * array of selected elements
    */
-  selectedNodes: Element[];
+  selectedNodes: PositionedElement[];
   /**
    * adds elements to the page
    */
-  insertNodes: (pageId: string, elements: Element[]) => void;
+  insertNodes: (elements: PositionedElement[], pageId: string) => void;
   /**
    * changes the layer position of an element
    */
@@ -65,11 +40,11 @@ export interface Props {
   /**
    * selects elements on the page
    */
-  selectToplevelNodes: (elements: Element) => void;
+  selectToplevelNodes: (elements: PositionedElement) => void;
   /**
    * deletes elements from the page
    */
-  removeNodes: (pageId: string, elementIds: string[]) => void;
+  removeNodes: (nodeIds: string[], pageId: string) => void;
   /**
    * commits events to layout engine
    */
@@ -83,14 +58,14 @@ export const basicHandlerCreators = {
     // This should also be abstracted.
     const clonedNodes = selectedNodes && cloneSubgraphs(selectedNodes);
     if (clonedNodes) {
-      insertNodes(pageId, clonedNodes);
+      insertNodes(clonedNodes, pageId);
       selectToplevelNodes(clonedNodes);
     }
   },
   deleteNodes: ({ pageId, removeNodes, selectedNodes }: Props) => (): void => {
     // currently, handle the removal of one node, exploiting multiselect subsequently
     if (selectedNodes.length) {
-      removeNodes(pageId, selectedNodes.map(extractId));
+      removeNodes(selectedNodes.map(extractId), pageId);
     }
   },
   createCustomElement: ({ selectedNodes }: Props) => (
@@ -140,7 +115,7 @@ export const clipboardHandlerCreators = {
   cutNodes: ({ pageId, removeNodes, selectedNodes }: Props) => (): void => {
     if (selectedNodes.length) {
       setClipboardData({ selectedNodes });
-      removeNodes(pageId, selectedNodes.map(extractId));
+      removeNodes(selectedNodes.map(extractId), pageId);
       notify.success('Cut element to clipboard');
     }
   },
@@ -154,7 +129,7 @@ export const clipboardHandlerCreators = {
     const { selectedNodes = [] } = JSON.parse(getClipboardData()) || {};
     const clonedNodes = selectedNodes && cloneSubgraphs(selectedNodes);
     if (clonedNodes) {
-      insertNodes(pageId, clonedNodes); // first clone and persist the new node(s)
+      insertNodes(clonedNodes, pageId); // first clone and persist the new node(s)
       selectToplevelNodes(clonedNodes); // then select the cloned node(s)
     }
   },

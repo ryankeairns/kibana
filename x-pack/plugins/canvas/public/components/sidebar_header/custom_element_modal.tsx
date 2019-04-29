@@ -26,9 +26,9 @@ import {
   EuiModalHeaderTitle,
   EuiModalHeader,
   EuiIcon,
-  // @ts-ignore EuiCard is an exported member of @elastic/eui
+  // @ts-ignore hasn't been converted to TypeScript yet
   EuiCard,
-  // @ts-ignore EuiFilePicker is an exported member of @elastic/eui
+  // @ts-ignore hasn't been converted to TypeScript yet
   EuiFilePicker,
 } from '@elastic/eui';
 import { VALID_IMAGE_TYPES } from '../../../common/lib/constants';
@@ -75,9 +75,9 @@ export class CustomElementModal extends PureComponent<Props> {
   };
 
   public state = {
-    name: this.props.name || '',
-    description: this.props.description || '',
-    image: this.props.image || '',
+    name: this.props.name || null,
+    description: this.props.description || null,
+    image: this.props.image || null,
   };
 
   private _handleChange = (type: string, value: string) => {
@@ -141,7 +141,11 @@ export class CustomElementModal extends PureComponent<Props> {
                     }
                   />
                 </EuiFormRow>
-                <EuiFormRow className="canvasCustomElementForm__thumbnail" label="Thumbnail image" compressed>
+                <EuiFormRow
+                  className="canvasCustomElementForm__thumbnail"
+                  label="Thumbnail image"
+                  compressed
+                >
                   <EuiFilePicker
                     initialPromptText="Select or drag and drop an image"
                     onChange={this._handleUpload}
@@ -150,7 +154,10 @@ export class CustomElementModal extends PureComponent<Props> {
                   />
                 </EuiFormRow>
                 <EuiText className="canvasCustomElementForm__thumbnailHelp" size="xs">
-                  <p>Take a screenshot of your element and upload it here. This can also be done after saving.</p>
+                  <p>
+                    Take a screenshot of your element and upload it here. This can also be done
+                    after saving.
+                  </p>
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem className="canvasElementCard canvasCustomElementForm__preview" grow={1}>
@@ -160,7 +167,7 @@ export class CustomElementModal extends PureComponent<Props> {
                 <EuiSpacer size="s" />
                 <EuiCard
                   textAlign="left"
-                  image={image || null}
+                  image={image}
                   icon={image ? null : <EuiIcon type="canvasApp" size="xxl" />}
                   title={name}
                   description={description}
