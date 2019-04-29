@@ -45,8 +45,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  insertNodes: (pageId, selectedNodes) => dispatch(insertNodes(selectedNodes, pageId)),
-  removeNodes: (pageId, nodeIds) => dispatch(removeElements(nodeIds, pageId)),
+  insertNodes: (selectedNodes, pageId) => dispatch(insertNodes(selectedNodes, pageId)),
+  removeNodes: (nodeIds, pageId) => dispatch(removeElements(nodeIds, pageId)),
   selectToplevelNodes: nodes =>
     dispatch(selectToplevelNodes(nodes.filter(e => !e.position.parent).map(e => e.id))),
   elementLayer: (pageId, elementId, movement) => {

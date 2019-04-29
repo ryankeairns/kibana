@@ -106,8 +106,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
   dispatch,
-  insertNodes: (pageId, selectedNodes) => dispatch(insertNodes(selectedNodes, pageId)),
-  removeNodes: (pageId, nodeIds) => dispatch(removeElements(nodeIds, pageId)),
+  insertNodes: (selectedNodes, pageId) => dispatch(insertNodes(selectedNodes, pageId)),
+  removeNodes: (nodeIds, pageId) => dispatch(removeElements(nodeIds, pageId)),
   selectToplevelNodes: nodes =>
     dispatch(selectToplevelNodes(nodes.filter(e => !e.position.parent).map(e => e.id))),
   // TODO: Abstract this out, this is similar to layering code in sidebar/index.js:

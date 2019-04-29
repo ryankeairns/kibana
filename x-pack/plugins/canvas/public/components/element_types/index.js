@@ -26,7 +26,7 @@ const mapStateToProps = state => ({ pageId: getSelectedPage(state) });
 const mapDispatchToProps = dispatch => ({
   selectToplevelNodes: nodes =>
     dispatch(selectToplevelNodes(nodes.filter(e => !e.position.parent).map(e => e.id))),
-  insertNodes: (pageId, selectedElements) => dispatch(insertNodes(selectedElements, pageId)),
+  insertNodes: (selectedNodes, pageId) => dispatch(insertNodes(selectedNodes, pageId)),
   addElement: pageId => partialElement => dispatch(addElement(pageId, partialElement)),
 });
 
@@ -45,7 +45,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
       const { selectedNodes = [] } = JSON.parse(customElement.content) || {};
       const clonedNodes = selectedNodes && cloneSubgraphs(selectedNodes);
       if (clonedNodes) {
-        insertNodes(pageId, clonedNodes); // first clone and persist the new node(s)
+        insertNodes(clonedNodes, pageId); // first clone and persist the new node(s)
         selectToplevelNodes(clonedNodes); // then select the cloned node(s)
       }
     },
