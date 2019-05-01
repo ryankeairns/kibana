@@ -42,19 +42,19 @@ export class AutoRefreshControls extends Component {
         <EuiFlexGroup alignItems="center" justifyContent="spaceAround" gutterSize="xs">
           <EuiFlexItem>
             <EuiDescriptionList textStyle="reverse">
-              <EuiDescriptionListTitle>Refresh this page</EuiDescriptionListTitle>
+              <EuiDescriptionListTitle>Current data refresh interval</EuiDescriptionListTitle>
               <EuiDescriptionListDescription>
                 {refreshInterval > 0 ? (
                   <Fragment>
                     <span>Every {timeDurationString(refreshInterval)}</span>
-                    <div>
-                      <EuiLink size="s" onClick={disableInterval}>
+                    <EuiText size="xs">
+                      <EuiLink color="danger" onClick={disableInterval}>
                         Disable auto-refresh
                       </EuiLink>
-                    </div>
+                    </EuiText>
                   </Fragment>
                 ) : (
-                  <span>Manually</span>
+                  <span>Manual</span>
                 )}
               </EuiDescriptionListDescription>
             </EuiDescriptionList>
