@@ -6,9 +6,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { EuiTextArea, EuiFormRow, EuiTitle } from '@elastic/eui';
+import { EuiFormRow, EuiTitle } from '@elastic/eui';
 import { debounce, startCase } from 'lodash';
-import { Autocomplete } from '../autocomplete';
+import MonacoEditor from 'react-monaco-editor';
 import {
   getAutocompleteSuggestions,
   getFnArgDefAtPosition,
@@ -104,13 +104,16 @@ export class ExpressionInput extends React.Component {
     this.ref.focus();
   };
 
-  onChange = e => {
+  onChange = (value, e) => {
+    console.log(value);
+
     const { target } = e;
-    const { value, selectionStart, selectionEnd } = target;
+    const { selectionStart, selectionEnd } = target;
     const selection = {
       start: selectionStart,
       end: selectionEnd,
     };
+
     this.updateState({ value, selection });
   };
 
@@ -162,9 +165,14 @@ export class ExpressionInput extends React.Component {
     return '';
   };
 
+  editorDidMount = editor => {
+    console.log('editorDidMount', editor);
+    editor.focus();
+  };
+
   render() {
-    const { value, error, isAutocompleteEnabled, fontSize } = this.props;
-    const { suggestions } = this.state;
+    const { value, error, fontSize } = this.props;
+    // const { suggestions } = this.state;
 
     const helpText = error
       ? null
@@ -178,7 +186,15 @@ export class ExpressionInput extends React.Component {
           error={error}
           helpText={helpText}
         >
-          {isAutocompleteEnabled ? (
+          <MonacoEditor
+            language="javascript"
+            value={value}
+            onChange={this.onChange}
+            editorDidMount={this.editorDidMount}
+            height={400}
+            options={{ fontSize }}
+          />
+          {/* {isAutocompleteEnabled ? (
             <Autocomplete
               header={this.getHeader()}
               items={suggestions}
@@ -207,7 +223,7 @@ export class ExpressionInput extends React.Component {
               style={{ fontSize: `${fontSize}px` }}
               resize="none"
             />
-          )}
+          )} */}
         </EuiFormRow>
       </div>
     );
