@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { EuiFormRow, EuiTitle } from '@elastic/eui';
 import { debounce, startCase } from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
-import lightTheme from '@elastic/eui/dist/eui_theme_light.json';
+
 import {
   // getAutocompleteSuggestions,
   getFnArgDefAtPosition,
@@ -17,59 +17,8 @@ import {
 import { FunctionReference } from './function_reference';
 import { ArgumentReference } from './argument_reference';
 
-const themeName = lightTheme;
-
-const syntaxTheme = {
-  keyword: themeName.euiColorAccent,
-  comment: themeName.euiColorDarkShade,
-  delimiter: themeName.euiColorSecondary,
-  string: themeName.euiColorPrimary,
-  number: themeName.euiColorWarning,
-  regexp: themeName.euiColorPrimary,
-  types: themeName.euiColorVis9,
-  annotation: themeName.euiColorLightShade,
-  tag: themeName.euiColorAccent,
-  symbol: themeName.euiColorDanger,
-  foreground: themeName.euiColorDarkestShade,
-  editorBackground: themeName.euiColorEmptyShade,
-  lineNumbers: themeName.euiColorDarkShade,
-  editorIndentGuide: themeName.euiColorLightShade,
-  selectionBackground: '#E3E4ED',
-  editorWidgetBackground: themeName.euiColorLightestShade,
-  editorWidgetBorder: themeName.euiColorLightShade,
-  findMatchBackground: themeName.euiColorWarning,
-  findMatchHighlightBackground: themeName.euiColorWarning,
-};
-
-/* eslint-disable */
-const language = {
-  keywords: ['essql', 'mapColumn', 'ply', 'staticColumn'],
-
-  symbols: /[=|]/,
-  digits: /\d+(_+\d+)*/,
-
-  tokenizer: {
-		root: [ [/[{}]/, 'delimiter.bracket'], { include: 'common' } ],
-
-    common: [
-			// identifiers and keywords
-			[/[a-z_$][\w$]*/, {
-				cases: {
-					'@keywords': 'keyword',
-					'@default': 'identifier'
-				}
-      }],
-      
-      [/"([^"\\]|\\.)*$/, 'string.invalid'],  // non-teminated string
-			[/'([^'\\]|\\.)*$/, 'string.invalid'],  // non-teminated string
-			[/"/, 'string'],
-			[/'/, 'string'],
-
-      [/@symbols/, 'delimiter']
-    ],
-  },
-};
-/* eslint-enable */
+import { language } from './editor_language';
+import { theme } from './editor_theme';
 
 export class ExpressionInput extends React.Component {
   constructor({ value }) {
@@ -87,6 +36,11 @@ export class ExpressionInput extends React.Component {
     };
   }
 
+  componentDidMount() {
+    // TODO: Maybe there is a better way to handle this
+    window.addEventListener('resize', this.updateDimensions);
+  }
+
   componentDidUpdate() {
     if (!this.ref) {
       return;
@@ -94,6 +48,10 @@ export class ExpressionInput extends React.Component {
     const { selection } = this.state;
     const { start, end } = selection;
     this.ref.setSelectionRange(start, end);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions);
   }
 
   undo() {
@@ -160,8 +118,6 @@ export class ExpressionInput extends React.Component {
   };
 
   onChange = value => {
-    console.log(value);
-
     // const { target } = e;
     // const { selectionStart, selectionEnd } = target;
     // const selection = {
@@ -221,82 +177,36 @@ export class ExpressionInput extends React.Component {
   };
 
   editorWillMount = monaco => {
-    // Register a new language
-    monaco.languages.register({ id: 'mySpecialLanguage' });
+    // Add our functions to the language keywords
+    language.keywords = this.props.functionDefinitions.map(fn => fn.name);
 
-    // Register a tokens provider for the language
+    // Register and setup the language for the expression editor
+    monaco.languages.register({ id: 'mySpecialLanguage' });
     monaco.languages.setMonarchTokensProvider('mySpecialLanguage', language);
 
-    monaco.editor.defineTheme('euiColors', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        { token: 'keyword', foreground: syntaxTheme.keyword, fontStyle: 'bold' },
-        { token: 'comment', foreground: syntaxTheme.comment },
-        { token: 'delimiter', foreground: syntaxTheme.delimiter },
-        { token: 'string', foreground: syntaxTheme.string },
-        { token: 'number', foreground: syntaxTheme.number },
-        { token: 'regexp', foreground: syntaxTheme.regexp },
-        { token: 'type', foreground: syntaxTheme.types },
-        { token: 'annotation', foreground: syntaxTheme.annotation },
-        { token: 'tag', foreground: syntaxTheme.tag },
-        { token: 'symbol', foreground: syntaxTheme.symbol },
-        // We provide an empty string fallback
-        { token: '', foreground: syntaxTheme.foreground },
-      ],
-      colors: {
-        'editor.foreground': syntaxTheme.foreground,
-        'editor.background': syntaxTheme.editorBackground,
-        'editorLineNumber.foreground': syntaxTheme.lineNumbers,
-        'editorLineNumber.activeForeground': syntaxTheme.lineNumbers,
-        'editorIndentGuide.background': syntaxTheme.editorIndentGuide,
-        'editor.selectionBackground': syntaxTheme.selectionBackground,
-        'editorWidget.border': syntaxTheme.editorWidgetBorder,
-        'editorWidget.background': syntaxTheme.editorWidgetBackground,
-      },
-    });
-    monaco.editor.setTheme('euiColors');
+    monaco.editor.defineTheme('euiColors', theme);
   };
 
-  editorDidMount = (editor, monaco) => {
-    console.log('editorDidMount', editor);
-    monaco.editor.defineTheme('euiColors', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        { token: 'keyword', foreground: syntaxTheme.keyword, fontStyle: 'bold' },
-        { token: 'comment', foreground: syntaxTheme.comment },
-        { token: 'delimiter', foreground: syntaxTheme.delimiter },
-        { token: 'string', foreground: syntaxTheme.string },
-        { token: 'number', foreground: syntaxTheme.number },
-        { token: 'regexp', foreground: syntaxTheme.regexp },
-        { token: 'type', foreground: syntaxTheme.types },
-        { token: 'annotation', foreground: syntaxTheme.annotation },
-        { token: 'tag', foreground: syntaxTheme.tag },
-        { token: 'symbol', foreground: syntaxTheme.symbol },
-        // We provide an empty string fallback
-        { token: '', foreground: syntaxTheme.foreground },
-      ],
-      colors: {
-        'editor.foreground': syntaxTheme.foreground,
-        'editor.background': syntaxTheme.editorBackground,
-        'editorLineNumber.foreground': syntaxTheme.lineNumbers,
-        'editorLineNumber.activeForeground': syntaxTheme.lineNumbers,
-        'editorIndentGuide.background': syntaxTheme.editorIndentGuide,
-        'editor.selectionBackground': syntaxTheme.selectionBackground,
-        'editorWidget.border': syntaxTheme.editorWidgetBorder,
-        'editorWidget.background': syntaxTheme.editorWidgetBackground,
-      },
-    });
-    monaco.editor.setTheme('euiColors');
-    monaco.editor.language = 'mySpecialLanguage';
+  editorDidMount = editor => {
+    this.editor = editor;
+  };
 
-    editor.focus();
+  updateDimensions = () => {
+    if (this.editor) {
+      this.editor.layout();
+    }
   };
 
   render() {
-    const { value, error, fontSize } = this.props;
+    const { value, error, fontSize, functionDefinitions } = this.props;
     // const { suggestions } = this.state;
+
+    // TODO: I'm not sure we want to do this but waiting till we have function
+    // definitions means we can easily get nice syntax highlighting on functions
+    if (functionDefinitions.length === 0) {
+      console.log('Waiting on functions');
+      return null;
+    }
 
     const helpText = error
       ? null
@@ -315,7 +225,7 @@ export class ExpressionInput extends React.Component {
             language="mySpecialLanguage"
             value={value}
             onChange={this.onChange}
-            // editorWillMount={this.editorWillMount}
+            editorWillMount={this.editorWillMount}
             editorDidMount={this.editorDidMount}
             height={250}
             options={{
