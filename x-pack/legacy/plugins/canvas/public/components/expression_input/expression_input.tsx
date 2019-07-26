@@ -11,6 +11,7 @@ import { debounce, startCase } from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor/esm/vs/editor/contrib/suggest/suggestController.js';
+// import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js';
 
 // @ts-ignore untyped local
 // import {
@@ -38,6 +39,7 @@ interface FunctionDef {
 
 interface Props {
   fontSize: number;
+  isAutocompleteEnabled: boolean;
   error?: string;
   value: string;
   functionDefinitions: FunctionDef[];
@@ -232,43 +234,91 @@ export class ExpressionInput extends React.Component<Props, State> {
     monaco.languages.register({ id: 'mySpecialLanguage' });
     monaco.languages.setMonarchTokensProvider('mySpecialLanguage', language);
 
-    // console.log(" Ok!");
+    // monaco.languages.registerSignatureHelpProvider('mySpecialLanguage', {
+    //   signatureHelpTriggerCharacters: ['|', '{', ' '],
+    //   provideSignatureHelp: (model, position) => {
+    //     console.log("hello!")
+    //     const textUntilPosition = model.getValueInRange({
+    //       startLineNumber: 1,
+    //       startColumn: 1,
+    //       endLineNumber: position.lineNumber,
+    //       endColumn: position.column,
+    //     });
+
+    //     console.log(`Text Until: ${textUntilPosition}`);
+
+    //     // const currentWord = model.getWordAtPosition(position);
+
+    //     // console.log(currentWord);
+
+    //     // if (!currentWord) {
+    //     //   return {
+    //     //     incomplete: true,
+    //     //     suggestions: [],
+    //     //   };
+    //     // }
+
+    //     console.log(textUntilPosition.length - 1)
+
+    //     const aSuggestions = getAutocompleteSuggestions(
+    //       this.props.functionDefinitions,
+    //       textUntilPosition,
+    //       textUntilPosition.length - 1
+    //     );
+
+    //     return {
+    //       signatures: [
+    //         {
+    //           label: "parameter1",
+    //           documentation: " this method does blah",
+    //           parameters: [
+    //             {
+    //               label: "ParamInfo1",
+    //               documentation: "this param does blah"
+    //             },
+    //           ],
+    //         },
+    //       ],
+    //       activeSignature: 0,
+    //       activeParameter: 0,
+    //     };
+    //   },
+    // });
 
     monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
       provideCompletionItems: (model, position) => {
-        // console.log("Hello");
-
         // find out if we are completing a property in the 'dependencies' object.
         const textUntilPosition = model.getValueInRange({
-          startLineNumber: position.lineNumber,
+          startLineNumber: 1,
           startColumn: 1,
           endLineNumber: position.lineNumber,
           endColumn: position.column,
         });
 
-        // console.log(`Text Until: ${textUntilPosition}`);
-
-        const currentWord = model.getWordAtPosition(position);
-
-        // console.log(currentWord);
-
-        if (!currentWord) {
-          return {
-            incomplete: true,
-            suggestions: [],
-          };
-        }
-
-        const suggestions = getAutocompleteSuggestions(
+        const aSuggestions = getAutocompleteSuggestions(
           this.props.functionDefinitions,
           textUntilPosition,
-          currentWord.startColumn - 1
+          textUntilPosition.length - 1
         );
 
-        // console.log(suggestions);
+        const suggestions = aSuggestions.map((s: any) => {
+          if (s.type === 'argument') {
+            return {
+              label: s.argDef.name,
+              kind: monaco.languages.CompletionItemKind.Field,
+              documentation: { value: s.argDef.help, isTrusted: true },
+              insertText: s.text,
+            };
+          } else {
+            return {
+              label: s.fnDef.name,
+              kind: monaco.languages.CompletionItemKind.Function,
+              documentation: { value: s.fnDef.help, isTrusted: true },
+              insertText: s.text,
+            };
+          }
+        });
 
-        // const match = textUntilPosition.match(/"dependencies"\s*:\s*{\s*("[^"]*"\s*:\s*"[^"]*"\s*,\s*)*("[^"]*)?$/);
-        // const suggestions = match ? createDependencyProposals() : [];
         return {
           suggestions,
         };
@@ -289,8 +339,7 @@ export class ExpressionInput extends React.Component<Props, State> {
   };
 
   render() {
-    const { value, error, fontSize, functionDefinitions } = this.props;
-    // const { suggestions } = this.state;
+    const { value, error, fontSize, functionDefinitions, isAutocompleteEnabled } = this.props;
 
     // TODO: I'm not sure we want to do this but waiting till we have function
     // definitions means we can easily get nice syntax highlighting on functions
@@ -320,6 +369,7 @@ export class ExpressionInput extends React.Component<Props, State> {
             height={250}
             options={{
               fontSize,
+              quickSuggestions: isAutocompleteEnabled,
               minimap: {
                 enabled: false,
               },

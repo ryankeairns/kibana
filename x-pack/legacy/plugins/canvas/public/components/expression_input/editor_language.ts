@@ -9,6 +9,7 @@ interface Language extends monacoEditor.languages.IMonarchLanguage {
   keywords: string[];
   symbols: RegExp;
   digits: RegExp;
+  boolean: ['true', 'false'];
 }
 
 export const language: Language = {
@@ -16,6 +17,7 @@ export const language: Language = {
 
   symbols: /[=|]/,
   digits: /\d+(_+\d+)*/,
+  boolean: ['true', 'false'],
 
   tokenizer: {
     root: [
@@ -32,6 +34,7 @@ export const language: Language = {
         {
           cases: {
             '@keywords': 'keyword',
+            '@boolean': 'symbol',
             '@default': 'identifier',
           },
         },
