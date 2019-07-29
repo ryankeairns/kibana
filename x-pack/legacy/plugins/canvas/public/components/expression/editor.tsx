@@ -22,7 +22,10 @@ interface Props {
    */
   height?: string | number;
 
-  language: string;
+  languageId: string;
+  languageDef:
+    | monacoEditor.languages.IMonarchLanguage
+    | PromiseLike<monacoEditor.languages.IMonarchLanguage>;
 
   value: string;
   onChange: (value: string) => void;
@@ -30,11 +33,11 @@ interface Props {
   options?: monacoEditor.editor.IEditorConstructionOptions;
 
   // TODO: implement
-  suggestionProvider: () => void;
+  suggestionProvider?: monaco.languages.CompletionItemProvider;
   // TODO: implement
-  signatureProvider: () => void;
+  signatureProvider?: monaco.languages.SignatureHelpProvider;
   // TODO: implement
-  hoverProvider: () => void;
+  hoverProvider?: monaco.languages.HoverProvider;
 
   editorWillMount?: EditorWillMount;
   overrideEditorWillMount?: EditorWillMount;
@@ -53,6 +56,29 @@ class Editor extends React.Component<Props, {}> {
 
     // Setup on language handler here which registers all our code providers for the language
     // https://microsoft.github.io/monaco-editor/api/modules/monaco.languages.html#onlanguage
+
+    monaco.languages.register({ id: this.props.languageId });
+    monaco.languages.setMonarchTokensProvider(this.props.languageId, this.props.languageDef);
+
+    monaco.languages.onLanguage(this.props.languageId, () => {
+      if (this.props.suggestionProvider) {
+        monaco.languages.registerCompletionItemProvider(
+          this.props.languageId,
+          this.props.suggestionProvider
+        );
+      }
+
+      if (this.props.signatureProvider) {
+        monaco.languages.registerSignatureHelpProvider(
+          this.props.languageId,
+          this.props.signatureProvider
+        );
+      }
+
+      if (this.props.hoverProvider) {
+        monaco.languages.registerHoverProvider(this.props.languageId, this.props.hoverProvider);
+      }
+    });
 
     if (this.props.editorWillMount) {
       this.props.editorWillMount(monaco);
