@@ -27,7 +27,6 @@ import { FunctionReference } from './function_reference';
 import { ArgumentReference } from './argument_reference';
 
 import { language } from './editor_language';
-import { theme } from './editor_theme';
 
 // TODO: update this
 interface FunctionDef {

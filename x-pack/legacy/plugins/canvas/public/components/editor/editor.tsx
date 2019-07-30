@@ -8,8 +8,11 @@ import React from 'react';
 
 import MonacoEditor, { EditorDidMount, EditorWillMount } from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
-import 'monaco-editor/esm/vs/editor/contrib/suggest/suggestController.js';
-import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js';
+import 'monaco-editor/esm/vs/editor/contrib/suggest/suggestController.js'; // Needed for suggestions
+import 'monaco-editor/esm/vs/editor/contrib/hover/hover.js'; // Needed for hover
+import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js'; // Needed for signature suggestions
+
+import { theme } from './editor_theme';
 
 interface Props {
   /**
@@ -32,12 +35,9 @@ interface Props {
 
   options?: monacoEditor.editor.IEditorConstructionOptions;
 
-  // TODO: implement
-  suggestionProvider?: monaco.languages.CompletionItemProvider;
-  // TODO: implement
-  signatureProvider?: monaco.languages.SignatureHelpProvider;
-  // TODO: implement
-  hoverProvider?: monaco.languages.HoverProvider;
+  suggestionProvider?: monacoEditor.languages.CompletionItemProvider;
+  signatureProvider?: monacoEditor.languages.SignatureHelpProvider;
+  hoverProvider?: monacoEditor.languages.HoverProvider;
 
   editorWillMount?: EditorWillMount;
   overrideEditorWillMount?: EditorWillMount;
@@ -45,8 +45,8 @@ interface Props {
   editorDidMount: EditorDidMount;
 }
 
-class Editor extends React.Component<Props, {}> {
-  editor: monacoEditor.editor.IStandaloneCodeEditor | null;
+export class Editor extends React.Component<Props, {}> {
+  editor: monacoEditor.editor.IStandaloneCodeEditor | null = null;
 
   editorWillMount(monaco: typeof monacoEditor) {
     if (this.props.overrideEditorWillMount) {
@@ -80,6 +80,9 @@ class Editor extends React.Component<Props, {}> {
       }
     });
 
+    // Register our theme
+    monaco.editor.defineTheme('euiColors', theme);
+
     if (this.props.editorWillMount) {
       this.props.editorWillMount(monaco);
     }
@@ -111,16 +114,19 @@ class Editor extends React.Component<Props, {}> {
   }
 
   render() {
+    const { languageId, value, onChange, editorDidMount, width, height, options } = this.props;
+
     return (
       <MonacoEditor
         theme="euiColors"
-        language="mySpecialLanguage"
-        value={this.props.value}
-        onChange={this.props.onChange}
+        language={languageId}
+        value={value}
+        onChange={onChange}
         editorWillMount={this.editorWillMount}
-        editorDidMount={this.props.editorDidMount}
-        height={250}
-        options={this.props.options}
+        editorDidMount={editorDidMount}
+        width={width}
+        height={height}
+        options={options}
       />
     );
   }
