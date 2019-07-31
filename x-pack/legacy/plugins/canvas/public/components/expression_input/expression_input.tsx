@@ -8,10 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { EuiFormRow, EuiTitle } from '@elastic/eui';
 import { debounce, startCase } from 'lodash';
-import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
-import 'monaco-editor/esm/vs/editor/contrib/suggest/suggestController.js';
-// import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js';
+
+import { Editor } from '../editor';
 
 // @ts-ignore untyped local
 // import {
@@ -26,7 +25,7 @@ import { FunctionReference } from './function_reference';
 // @ts-ignore untyped local
 import { ArgumentReference } from './argument_reference';
 
-import { language } from './editor_language';
+import { language } from './expression_language';
 
 // TODO: update this
 interface FunctionDef {
@@ -85,11 +84,6 @@ export class ExpressionInput extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    // TODO: Maybe there is a better way to handle this
-    window.addEventListener('resize', this.updateDimensions);
-  }
-
   componentDidUpdate() {
     // if (!this.ref) {
     //   return;
@@ -97,10 +91,6 @@ export class ExpressionInput extends React.Component<Props, State> {
     // const { selection } = this.state;
     // const { start, end } = selection;
     // this.ref.setSelectionRange(start, end);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateDimensions);
   }
 
   undo() {
@@ -225,67 +215,12 @@ export class ExpressionInput extends React.Component<Props, State> {
   //   return '';
   // };
 
-  editorWillMount = (monaco: typeof monacoEditor) => {
-    // Add our functions to the language keywords
-    language.keywords = this.props.functionDefinitions.map(fn => fn.name);
-
-    // Register and setup the language for the expression editor
-    monaco.languages.register({ id: 'mySpecialLanguage' });
-    monaco.languages.setMonarchTokensProvider('mySpecialLanguage', language);
-
-    // monaco.languages.registerSignatureHelpProvider('mySpecialLanguage', {
-    //   signatureHelpTriggerCharacters: ['|', '{', ' '],
-    //   provideSignatureHelp: (model, position) => {
-    //     console.log("hello!")
-    //     const textUntilPosition = model.getValueInRange({
-    //       startLineNumber: 1,
-    //       startColumn: 1,
-    //       endLineNumber: position.lineNumber,
-    //       endColumn: position.column,
-    //     });
-
-    //     console.log(`Text Until: ${textUntilPosition}`);
-
-    //     // const currentWord = model.getWordAtPosition(position);
-
-    //     // console.log(currentWord);
-
-    //     // if (!currentWord) {
-    //     //   return {
-    //     //     incomplete: true,
-    //     //     suggestions: [],
-    //     //   };
-    //     // }
-
-    //     console.log(textUntilPosition.length - 1)
-
-    //     const aSuggestions = getAutocompleteSuggestions(
-    //       this.props.functionDefinitions,
-    //       textUntilPosition,
-    //       textUntilPosition.length - 1
-    //     );
-
-    //     return {
-    //       signatures: [
-    //         {
-    //           label: "parameter1",
-    //           documentation: " this method does blah",
-    //           parameters: [
-    //             {
-    //               label: "ParamInfo1",
-    //               documentation: "this param does blah"
-    //             },
-    //           ],
-    //         },
-    //       ],
-    //       activeSignature: 0,
-    //       activeParameter: 0,
-    //     };
-    //   },
-    // });
-
-    monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
-      provideCompletionItems: (model, position) => {
+  suggestProvider = () => {
+    return {
+      provideCompletionItems: (
+        model: monacoEditor.editor.ITextModel,
+        position: monacoEditor.Position
+      ) => {
         // find out if we are completing a property in the 'dependencies' object.
         const textUntilPosition = model.getValueInRange({
           startLineNumber: 1,
@@ -304,14 +239,14 @@ export class ExpressionInput extends React.Component<Props, State> {
           if (s.type === 'argument') {
             return {
               label: s.argDef.name,
-              kind: monaco.languages.CompletionItemKind.Field,
+              kind: monacoEditor.languages.CompletionItemKind.Field,
               documentation: { value: s.argDef.help, isTrusted: true },
               insertText: s.text,
             };
           } else {
             return {
               label: s.fnDef.name,
-              kind: monaco.languages.CompletionItemKind.Function,
+              kind: monacoEditor.languages.CompletionItemKind.Function,
               documentation: { value: s.fnDef.help, isTrusted: true },
               insertText: s.text,
             };
@@ -322,19 +257,62 @@ export class ExpressionInput extends React.Component<Props, State> {
           suggestions,
         };
       },
-    });
-
-    monaco.editor.defineTheme('euiColors', theme);
+    };
   };
 
-  editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
-    this.editor = editor;
-  };
+  signatureProvider = () => {
+    return {
+      signatureHelpTriggerCharacters: ['|', '{', ' '],
+      provideSignatureHelp: (
+        model: monacoEditor.editor.ITextModel,
+        position: monacoEditor.Position
+      ) => {
+        // const textUntilPosition = model.getValueInRange({
+        //   startLineNumber: 1,
+        //   startColumn: 1,
+        //   endLineNumber: position.lineNumber,
+        //   endColumn: position.column,
+        // });
 
-  updateDimensions = () => {
-    if (this.editor) {
-      this.editor.layout();
-    }
+        // console.log(`Text Until: ${textUntilPosition}`);
+
+        // const currentWord = model.getWordAtPosition(position);
+
+        // console.log(currentWord);
+
+        // if (!currentWord) {
+        //   return {
+        //     incomplete: true,
+        //     suggestions: [],
+        //   };
+        // }
+
+        // console.log(textUntilPosition.length - 1);
+
+        // const aSuggestions = getAutocompleteSuggestions(
+        //   this.props.functionDefinitions,
+        //   textUntilPosition,
+        //   textUntilPosition.length - 1
+        // );
+
+        return {
+          signatures: [
+            {
+              label: 'parameter1',
+              documentation: ' this method does blah',
+              parameters: [
+                {
+                  label: 'ParamInfo1',
+                  documentation: 'this param does blah',
+                },
+              ],
+            },
+          ],
+          activeSignature: 0,
+          activeParameter: 0,
+        };
+      },
+    };
   };
 
   render() {
@@ -358,13 +336,11 @@ export class ExpressionInput extends React.Component<Props, State> {
           error={error}
           helpText={helpText}
         >
-          <MonacoEditor
-            theme="euiColors"
-            language="mySpecialLanguage"
+          <Editor
+            languageId="expression"
+            languageDef={language}
             value={value}
             onChange={this.onChange}
-            editorWillMount={this.editorWillMount}
-            editorDidMount={this.editorDidMount}
             height={250}
             options={{
               fontSize,

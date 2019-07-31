@@ -42,7 +42,7 @@ interface Props {
   editorWillMount?: EditorWillMount;
   overrideEditorWillMount?: EditorWillMount;
 
-  editorDidMount: EditorDidMount;
+  editorDidMount?: EditorDidMount;
 }
 
 export class Editor extends React.Component<Props, {}> {
