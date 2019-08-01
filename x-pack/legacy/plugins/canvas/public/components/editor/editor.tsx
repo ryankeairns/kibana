@@ -48,7 +48,7 @@ interface Props {
 export class Editor extends React.Component<Props, {}> {
   editor: monacoEditor.editor.IStandaloneCodeEditor | null = null;
 
-  editorWillMount(monaco: typeof monacoEditor) {
+  editorWillMount = (monaco: typeof monacoEditor) => {
     if (this.props.overrideEditorWillMount) {
       this.props.overrideEditorWillMount(monaco);
       return;
@@ -86,7 +86,7 @@ export class Editor extends React.Component<Props, {}> {
     if (this.props.editorWillMount) {
       this.props.editorWillMount(monaco);
     }
-  }
+  };
 
   editorDidMount = (
     editor: monacoEditor.editor.IStandaloneCodeEditor,

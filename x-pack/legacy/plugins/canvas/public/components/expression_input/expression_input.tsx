@@ -341,6 +341,8 @@ export class ExpressionInput extends React.Component<Props, State> {
             languageDef={language}
             value={value}
             onChange={this.onChange}
+            suggestionProvider={this.suggestProvider()}
+            signatureProvider={this.signatureProvider()}
             height={250}
             options={{
               fontSize,
@@ -348,6 +350,7 @@ export class ExpressionInput extends React.Component<Props, State> {
               minimap: {
                 enabled: false,
               },
+              wordBasedSuggestions: false,
             }}
           />
         </EuiFormRow>
