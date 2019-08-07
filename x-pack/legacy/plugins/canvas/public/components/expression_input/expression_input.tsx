@@ -18,7 +18,10 @@ import { Editor } from '../editor';
 //   getFnArgDefAtPosition,
 // } from '../../../common/lib/autocomplete'; // @ts-ignore untyped local
 // @ts-ignore untyped local
-import { getAutocompleteSuggestions } from '../../../common/lib/autocomplete'; // @ts-ignore untyped local
+import {
+  getAutocompleteSuggestions,
+  getFnArgDefAtPosition,
+} from '../../../common/lib/autocomplete'; // @ts-ignore untyped local
 
 // @ts-ignore untyped local
 import { FunctionReference } from './function_reference';
@@ -232,8 +235,11 @@ export class ExpressionInput extends React.Component<Props, State> {
         const aSuggestions = getAutocompleteSuggestions(
           this.props.functionDefinitions,
           textUntilPosition,
-          textUntilPosition.length - 1
+          textUntilPosition.length
         );
+
+        console.log('Suggest');
+        console.log(aSuggestions);
 
         const suggestions = aSuggestions.map((s: any) => {
           if (s.type === 'argument') {
@@ -249,6 +255,9 @@ export class ExpressionInput extends React.Component<Props, State> {
               kind: monacoEditor.languages.CompletionItemKind.Function,
               documentation: { value: s.fnDef.help, isTrusted: true },
               insertText: s.text,
+              command: {
+                id: 'editor.action.triggerParameterHints',
+              },
             };
           }
         });
@@ -262,54 +271,47 @@ export class ExpressionInput extends React.Component<Props, State> {
 
   signatureProvider = () => {
     return {
-      signatureHelpTriggerCharacters: ['|', '{', ' '],
       provideSignatureHelp: (
         model: monacoEditor.editor.ITextModel,
         position: monacoEditor.Position
       ) => {
-        // const textUntilPosition = model.getValueInRange({
-        //   startLineNumber: 1,
-        //   startColumn: 1,
-        //   endLineNumber: position.lineNumber,
-        //   endColumn: position.column,
-        // });
+        const textUntilPosition = model.getValueInRange({
+          startLineNumber: 1,
+          startColumn: 1,
+          endLineNumber: position.lineNumber,
+          endColumn: position.column,
+        });
 
-        // console.log(`Text Until: ${textUntilPosition}`);
-
-        // const currentWord = model.getWordAtPosition(position);
-
-        // console.log(currentWord);
-
-        // if (!currentWord) {
-        //   return {
-        //     incomplete: true,
-        //     suggestions: [],
-        //   };
-        // }
-
-        // console.log(textUntilPosition.length - 1);
-
-        // const aSuggestions = getAutocompleteSuggestions(
-        //   this.props.functionDefinitions,
-        //   textUntilPosition,
-        //   textUntilPosition.length - 1
-        // );
+        const { fnDef, argDef } = getFnArgDefAtPosition(
+          this.props.functionDefinitions,
+          textUntilPosition,
+          textUntilPosition.length
+        );
+        console.log('checking');
+        if (argDef) {
+          console.log(fnDef.args);
+          return {
+            signatures: [
+              {
+                label: fnDef.name,
+                documentation: fnDef.help,
+                parameters: Object.keys(fnDef.args).map(argName => {
+                  const arg = fnDef.args[argName];
+                  console.log(arg);
+                  return {
+                    label: arg.name,
+                    documentation: arg.help,
+                  };
+                }),
+              },
+            ],
+            activeSignature: 0,
+            activeParameter: 0,
+          };
+        }
 
         return {
-          signatures: [
-            {
-              label: 'parameter1',
-              documentation: ' this method does blah',
-              parameters: [
-                {
-                  label: 'ParamInfo1',
-                  documentation: 'this param does blah',
-                },
-              ],
-            },
-          ],
-          activeSignature: 0,
-          activeParameter: 0,
+          signatures: [],
         };
       },
     };
