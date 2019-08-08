@@ -248,6 +248,15 @@ export class ExpressionInput extends React.Component<Props, State> {
               kind: monacoEditor.languages.CompletionItemKind.Field,
               documentation: { value: s.argDef.help, isTrusted: true },
               insertText: s.text,
+              command: {
+                id: 'editor.action.triggerSuggest',
+              },
+            };
+          } else if (s.type === 'value') {
+            return {
+              label: s.text,
+              kind: monacoEditor.languages.CompletionItemKind.Value,
+              insertText: s.text,
             };
           } else {
             return {
@@ -312,6 +321,8 @@ export class ExpressionInput extends React.Component<Props, State> {
 
         return {
           signatures: [],
+          activeSignature: 0,
+          activeParameter: 0,
         };
       },
     };
@@ -325,6 +336,9 @@ export class ExpressionInput extends React.Component<Props, State> {
     if (functionDefinitions.length === 0) {
       return null;
     }
+
+    // TODO: Move this
+    language.keywords = this.props.functionDefinitions.map(fn => fn.name);
 
     const helpText = error
       ? null
