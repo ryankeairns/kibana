@@ -31,10 +31,17 @@ import { ArgumentReference } from './argument_reference';
 import { language } from './expression_language';
 
 // TODO: update this
+interface ArgDef {
+  text: string;
+  name: string;
+}
+
 interface FunctionDef {
   name: string;
   help: string;
-  args: any;
+  args: {
+    [key: string]: ArgDef;
+  };
   type: string;
 }
 
@@ -220,22 +227,30 @@ export class ExpressionInput extends React.Component<Props, State> {
 
   suggestProvider = () => {
     return {
+      signatureHelpTriggerCharacters: [' '],
       provideCompletionItems: (
         model: monacoEditor.editor.ITextModel,
         position: monacoEditor.Position
       ) => {
         // find out if we are completing a property in the 'dependencies' object.
-        const textUntilPosition = model.getValueInRange({
-          startLineNumber: 1,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column,
+        const text = model.getValue();
+        const textRange = model.getFullModelRange();
+
+        const lengthAfterPosition = model.getValueLengthInRange({
+          startLineNumber: position.lineNumber,
+          startColumn: position.column,
+          endLineNumber: textRange.endLineNumber,
+          endColumn: textRange.endColumn,
         });
+
+        console.log(text);
+        console.log(lengthAfterPosition);
+        console.log(text.length - lengthAfterPosition);
 
         const aSuggestions = getAutocompleteSuggestions(
           this.props.functionDefinitions,
-          textUntilPosition,
-          textUntilPosition.length
+          text,
+          text.length - lengthAfterPosition
         );
 
         console.log('Suggest');
@@ -257,6 +272,9 @@ export class ExpressionInput extends React.Component<Props, State> {
               label: s.text,
               kind: monacoEditor.languages.CompletionItemKind.Value,
               insertText: s.text,
+              command: {
+                id: 'editor.action.triggerParameterHints',
+              },
             };
           } else {
             return {
@@ -280,29 +298,35 @@ export class ExpressionInput extends React.Component<Props, State> {
 
   signatureProvider = () => {
     return {
+
       provideSignatureHelp: (
         model: monacoEditor.editor.ITextModel,
         position: monacoEditor.Position
       ) => {
-        const textUntilPosition = model.getValueInRange({
-          startLineNumber: 1,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column,
+        const text = model.getValue();
+        const textRange = model.getFullModelRange();
+
+        const lengthAfterPosition = model.getValueLengthInRange({
+          startLineNumber: position.lineNumber,
+          startColumn: position.column,
+          endLineNumber: textRange.endLineNumber,
+          endColumn: textRange.endColumn,
         });
 
         const { fnDef, argDef } = getFnArgDefAtPosition(
           this.props.functionDefinitions,
-          textUntilPosition,
-          textUntilPosition.length
+          text,
+          text.length - lengthAfterPosition
         );
         console.log('checking');
-        if (argDef) {
+        if (fnDef) {
           console.log(fnDef.args);
           return {
             signatures: [
               {
-                label: fnDef.name,
+                label: `${fnDef.name} ${Object.values((fnDef as FunctionDef).args).map(
+                  (arg: ArgDef) => arg.name
+                )}=`,
                 documentation: fnDef.help,
                 parameters: Object.keys(fnDef.args).map(argName => {
                   const arg = fnDef.args[argName];

@@ -114,7 +114,7 @@ export class Editor extends React.Component<Props, {}> {
   }
 
   render() {
-    const { languageId, value, onChange, editorDidMount, width, height, options } = this.props;
+    const { languageId, value, onChange, width, height, options } = this.props;
 
     return (
       <MonacoEditor
@@ -123,7 +123,7 @@ export class Editor extends React.Component<Props, {}> {
         value={value}
         onChange={onChange}
         editorWillMount={this.editorWillMount}
-        editorDidMount={editorDidMount}
+        editorDidMount={this.editorDidMount}
         width={width}
         height={height}
         options={options}
