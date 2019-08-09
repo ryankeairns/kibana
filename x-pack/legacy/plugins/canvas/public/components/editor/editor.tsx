@@ -10,7 +10,7 @@ import MonacoEditor, { EditorDidMount, EditorWillMount } from 'react-monaco-edit
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor/esm/vs/editor/contrib/suggest/suggestController.js'; // Needed for suggestions
 import 'monaco-editor/esm/vs/editor/contrib/hover/hover.js'; // Needed for hover
-import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js'; // Needed for signature suggestions
+import 'monaco-editor/esm/vs/editor/contrib/parameterHints/parameterHints.js'; // Needed for signature
 
 import { theme } from './editor_theme';
 
@@ -80,7 +80,7 @@ export class Editor extends React.Component<Props, {}> {
       }
     });
 
-    // Register our theme
+    // Register the lovely theme
     monaco.editor.defineTheme('euiColors', theme);
 
     if (this.props.editorWillMount) {
@@ -102,7 +102,9 @@ export class Editor extends React.Component<Props, {}> {
   componentDidMount() {
     const width = this.props.width ? '' + this.props.width : null;
 
-    // If width isn't specified OR it's variable, re-layout
+    // If width isn't specified OR it's variable,
+    // we'll want to setup a listener to re-layout the code editor
+    // when the window resizes
     // TODO: Maybe there is a better way to handle this
     if (!width || width[width.length - 1] === '%') {
       window.addEventListener('resize', this.updateDimensions);
