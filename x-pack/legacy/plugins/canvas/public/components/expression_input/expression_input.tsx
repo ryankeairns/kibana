@@ -6,8 +6,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { EuiFormRow, EuiTitle } from '@elastic/eui';
-import { debounce, startCase } from 'lodash';
+import { EuiFormRow } from '@elastic/eui';
+import { debounce } from 'lodash';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 
 import { Editor } from '../editor';
