@@ -19,11 +19,6 @@ import {
   getFnArgDefAtPosition,
 } from '../../../common/lib/autocomplete';
 
-// @ts-ignore untyped local
-import { FunctionReference } from './function_reference';
-// @ts-ignore untyped local
-import { ArgumentReference } from './argument_reference';
-
 import { language } from './expression_language';
 
 // TODO: update and remove when https://github.com/elastic/kibana/pull/42502 hits
