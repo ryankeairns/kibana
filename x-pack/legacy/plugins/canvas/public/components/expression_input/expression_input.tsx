@@ -148,7 +148,7 @@ export class ExpressionInput extends React.Component<Props> {
         const doc = `**Aliases**: ${aliases.length ? aliases.join(' | ') : 'null'}, **Types**: ${
           types.length ? types.join(' | ') : 'null'
         }
-\n\n**Default**: ${def != null ? def : ''}, **Required**: ${String(Boolean(required))}
+\n\n${def != null ? '**Default**: ' + def + ', ' : ''}**Required**: ${String(Boolean(required))}
 \n\n${help}`;
 
         return {
@@ -172,7 +172,7 @@ export class ExpressionInput extends React.Component<Props> {
       } else {
         const { help, context, type } = s.fnDef;
         const doc = `**Accepts**: ${
-          context.types ? context.types.join('|') : 'null'
+          context.types ? context.types.join(' | ') : 'null'
         }, **Returns**: ${type ? type : 'null'}
 \n\n${help}`;
 
