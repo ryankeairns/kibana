@@ -118,7 +118,7 @@ export class DashboardAppController {
         timefilter: { timefilter },
       },
     },
-    core: { notifications, overlays, chrome, injectedMetadata, uiSettings, savedObjects },
+    core: { notifications, overlays, chrome, injectedMetadata, uiSettings, savedObjects, http },
   }: DashboardAppControllerDependencies) {
     new FilterStateManager(globalState, getAppState, filterManager);
     const queryFilter = filterManager;
@@ -192,6 +192,8 @@ export class DashboardAppController {
       const emptyScreenProps: DashboardEmptyScreenProps = {
         onLinkClick: shouldShowEditHelp ? $scope.showAddPanel : $scope.enterEditMode,
         showLinkToVisualize: shouldShowEditHelp,
+        uiSettings,
+        http,
       };
       if (shouldShowEditHelp) {
         emptyScreenProps.onVisualizeClick = addVisualization;
