@@ -4,7 +4,7 @@ exports[`DashboardEmptyScreen renders correctly with visualize paragraph 1`] = `
 <DashboardEmptyScreen
   http={
     Object {
-      "addLoadingCount": [MockFunction],
+      "addLoadingCountSource": [MockFunction],
       "anonymousPaths": Object {
         "isAnonymous": [MockFunction],
         "register": [MockFunction],
@@ -25,8 +25,6 @@ exports[`DashboardEmptyScreen renders correctly with visualize paragraph 1`] = `
       "patch": [MockFunction],
       "post": [MockFunction],
       "put": [MockFunction],
-      "removeAllInterceptors": [MockFunction],
-      "stop": [MockFunction],
     }
   }
   intl={
@@ -365,7 +363,7 @@ exports[`DashboardEmptyScreen renders correctly without visualize paragraph 1`] 
 <DashboardEmptyScreen
   http={
     Object {
-      "addLoadingCount": [MockFunction],
+      "addLoadingCountSource": [MockFunction],
       "anonymousPaths": Object {
         "isAnonymous": [MockFunction],
         "register": [MockFunction],
@@ -386,8 +384,6 @@ exports[`DashboardEmptyScreen renders correctly without visualize paragraph 1`] 
       "patch": [MockFunction],
       "post": [MockFunction],
       "put": [MockFunction],
-      "removeAllInterceptors": [MockFunction],
-      "stop": [MockFunction],
     }
   }
   intl={
