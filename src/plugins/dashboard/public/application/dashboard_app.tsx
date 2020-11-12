@@ -80,6 +80,7 @@ import { DashboardTopNav } from './top_nav/dashboard_top_nav';
 import { dashboardBreadcrumb, getDashboardTitle, leaveConfirmStrings } from './dashboard_strings';
 import type { TagDecoratedSavedObject } from '../../../saved_objects_tagging_oss/public';
 import { DashboardEmptyScreen } from './empty_screen/dashboard_empty_screen';
+import { PanelToolbar } from './top_nav/panel_toolbar';
 import {
   DashboardConstants,
   DashboardContainer,
@@ -678,10 +679,11 @@ export function DashboardApp({
         <DashboardEmptyScreen
           isReadonlyMode={dashboardContainer.getInput().dashboardCapabilities?.hideWriteControls}
           onLinkClick={isEditMode ? addFromLibrary : () => updateViewMode(ViewMode.EDIT)}
-          onVisualizeClick={createNew}
           showLinkToVisualize={isEditMode}
           uiSettings={uiSettings}
           http={core.http}
+          createNew={createNew}
+          addFromLibrary={addFromLibrary}
         />
       );
     };
@@ -801,6 +803,9 @@ export function DashboardApp({
           }}
         />
       )}
+      {!state.dashboardStateManager?.getIsViewMode() ? (
+        <PanelToolbar onAddPanelClick={createNew} onLibraryClick={addFromLibrary} />
+      ) : null}
       <div id="dashboardViewport" />
     </div>
   );
