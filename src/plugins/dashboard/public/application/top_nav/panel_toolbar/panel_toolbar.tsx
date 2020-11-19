@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import './panel_toolbar.scss';
 import React, { FC } from 'react';
 import { i18n } from '@kbn/i18n';
 import { EuiButton, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
@@ -29,16 +30,22 @@ interface Props {
 }
 
 export const PanelToolbar: FC<Props> = ({ onAddPanelClick, onLibraryClick }) => (
-  <EuiFlexGroup id="kbnDashboard__panelToolbar">
+  <EuiFlexGroup className="panelToolbar" id="kbnDashboard__panelToolbar" gutterSize="s">
     <EuiFlexItem grow={false}>
-      <EuiButton fill size="s" iconType="plusInCircle" onClick={onAddPanelClick}>
+      <EuiButton fill size="s" iconType="plusInCircleFilled" onClick={onAddPanelClick}>
         {i18n.translate('dashboard.panelToolbar.addPanelButtonLabel', {
           defaultMessage: 'Create panel',
         })}
       </EuiButton>
     </EuiFlexItem>
     <EuiFlexItem grow={false}>
-      <EuiButton size="s" iconType="folderOpen" onClick={onLibraryClick}>
+      <EuiButton
+        size="s"
+        color="text"
+        className="panelToolbarButton"
+        iconType="folderOpen"
+        onClick={onLibraryClick}
+      >
         {i18n.translate('dashboard.panelToolbar.libraryButtonLabel', {
           defaultMessage: 'Add from library',
         })}

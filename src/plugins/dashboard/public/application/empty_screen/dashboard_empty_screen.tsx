@@ -19,6 +19,7 @@
 import React from 'react';
 import { I18nProvider, FormattedMessage } from '@kbn/i18n/react';
 import {
+  EuiIcon,
   EuiLink,
   EuiSpacer,
   EuiPageContent,
@@ -27,9 +28,6 @@ import {
   EuiImage,
   EuiText,
   EuiTitle,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButton,
 } from '@elastic/eui';
 import { IUiSettingsClient, HttpStart } from 'kibana/public';
 import { emptyScreenStrings as constants } from '../dashboard_strings';
@@ -40,8 +38,6 @@ export interface DashboardEmptyScreenProps {
   uiSettings: IUiSettingsClient;
   http: HttpStart;
   isReadonlyMode?: boolean;
-  createNew: () => void;
-  addFromLibrary: () => void;
 }
 
 export function DashboardEmptyScreen({
@@ -50,8 +46,6 @@ export function DashboardEmptyScreen({
   uiSettings,
   http,
   isReadonlyMode,
-  addFromLibrary,
-  createNew,
 }: DashboardEmptyScreenProps) {
   const IS_DARK_THEME = uiSettings.get('theme:darkMode');
   const emptyStateGraphicURL = IS_DARK_THEME
@@ -122,7 +116,9 @@ export function DashboardEmptyScreen({
   const viewMode = page(constants.fillDashboardTitle, true);
   const editMode = (
     <div data-test-subj="emptyDashboardWidget" className="dshEmptyWidget testClass">
-      <EuiTitle size="s">
+      <EuiIcon color="subdued" size="xl" type="visAreaStacked" />
+      <EuiSpacer size="s" />
+      <EuiTitle size="xs">
         <h3>
           <FormattedMessage
             id="dashboard.emptyWidget.addPanelTitle"
@@ -131,27 +127,14 @@ export function DashboardEmptyScreen({
         </h3>
       </EuiTitle>
       <EuiSpacer size="s" />
-      <EuiText>
+      <EuiText size="s" color="subdued">
         <span>
           <FormattedMessage
             id="dashboard.emptyWidget.addPanelDescription"
-            defaultMessage="A panel has everything you need to tell a story about your data."
+            defaultMessage="Create content that tells a story about your data."
           />
         </span>
       </EuiText>
-      <EuiSpacer size="s" />
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiButton fill size="s" onClick={createNew}>
-            Create from scratch
-          </EuiButton>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiButton size="s" onClick={addFromLibrary}>
-            Add from library
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
     </div>
   );
   const actionableMode = showLinkToVisualize ? editMode : viewMode;
