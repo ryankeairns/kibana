@@ -23,7 +23,7 @@ import { SavedObject, SavedObjectReference } from '../../../core/types';
 import { SavedObjectsFindOptionsReference } from '../../../core/public';
 import { SavedObject as SavedObjectClass } from '../../saved_objects/public';
 import { TagDecoratedSavedObject } from './decorator';
-import { ITagsClient } from '../common';
+import { ITagsClient, Tag } from '../common';
 
 /**
  * @public
@@ -44,6 +44,13 @@ export type SavedObjectTagDecoratorTypeGuard = SavedObjectsTaggingApiUi['hasTagD
  * @public
  */
 export interface SavedObjectsTaggingApiUi {
+  /**
+   * Return a Tag from an ID
+   *
+   * @param tagId
+   */
+  getTag(tagId: string): Tag | undefined;
+
   /**
    * Type-guard to safely manipulate tag-enhanced `SavedObject` from the `savedObject` plugin.
    *

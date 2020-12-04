@@ -12,6 +12,7 @@ import {
   updateTagsReferences,
   getTagIdsFromReferences,
   tagIdToReference,
+  getTag,
 } from './utils';
 
 const createTag = (id: string, name: string = id) => ({
@@ -70,6 +71,12 @@ describe('convertTagNameToId', () => {
 
   it('returns undefined if no tag was found', () => {
     expect(convertTagNameToId('name-4', allTags)).toBeUndefined();
+  });
+});
+
+describe('getTag', () => {
+  it('returns the tag for the given id', () => {
+    expect(getTag('id-2', allTags)).toEqual(tag2);
   });
 });
 

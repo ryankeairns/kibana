@@ -15,6 +15,8 @@ import {
   EuiSelectableTemplateSitewide,
   EuiSelectableTemplateSitewideOption,
   EuiText,
+  EuiBadge,
+  euiSelectableTemplateSitewideRenderOptions,
 } from '@elastic/eui';
 import { METRIC_TYPE, UiCounterMetricType } from '@kbn/analytics';
 import { i18n } from '@kbn/i18n';
@@ -69,8 +71,11 @@ const sortByTitle = (a: GlobalSearchResult, b: GlobalSearchResult): number => {
   return 0;
 };
 
-const resultToOption = (result: GlobalSearchResult): EuiSelectableTemplateSitewideOption => {
-  const { id, title, url, icon, type, meta } = result;
+const resultToOption = (
+  result: GlobalSearchResult,
+  getTag?: SavedObjectTaggingPluginStart['ui']['getTag']
+): EuiSelectableTemplateSitewideOption => {
+  const { id, title, url, icon, type, meta, tags = [] } = result;
   // only displaying icons for applications
   const useIcon = type === 'application';
   const option: EuiSelectableTemplateSitewideOption = {
@@ -88,6 +93,19 @@ const resultToOption = (result: GlobalSearchResult): EuiSelectableTemplateSitewi
     option.meta = [{ text: cleanMeta(type) }];
   }
 
+  if (getTag && tags.length) {
+    const tagBadges = tags.map((tag) => {
+      const { color, name, id: tagId } = getTag(tag)!;
+      return (
+        <EuiBadge color={color} key={tagId}>
+          {name}
+        </EuiBadge>
+      );
+    });
+
+    option.append = <ul style={{ display: 'inline' }}>{tagBadges}</ul>;
+  }
+
   return option;
 };
 
@@ -101,6 +119,7 @@ export function SearchBar({
 }: Props) {
   const isMounted = useMountedState();
   const [searchValue, setSearchValue] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchRef, setSearchRef] = useState<HTMLInputElement | null>(null);
   const [buttonRef, setButtonRef] = useState<HTMLDivElement | null>(null);
   const searchSubscription = useRef<Subscription | null>(null);
@@ -113,9 +132,9 @@ export function SearchBar({
         return;
       }
 
-      _setOptions(_options.map(resultToOption));
+      _setOptions(_options.map((result) => resultToOption(result, taggingApi?.ui.getTag)));
     },
-    [isMounted, _setOptions]
+    [isMounted, _setOptions, taggingApi]
   );
 
   useDebounce(
@@ -143,6 +162,7 @@ export function SearchBar({
         types: rawParams.filters.types,
         tags: tagIds,
       };
+      setSearchTerm(rawParams.term ?? '');
 
       searchSubscription.current = globalSearch(searchParams, {}).subscribe({
         next: ({ results }) => {
@@ -257,6 +277,7 @@ export function SearchBar({
       options={options}
       popoverButtonBreakpoints={['xs', 's']}
       singleSelection={true}
+      renderOption={(option) => euiSelectableTemplateSitewideRenderOptions(option, searchTerm)}
       popoverButton={
         <EuiHeaderSectionItemButton
           aria-label={i18n.translate(

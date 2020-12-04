@@ -44,6 +44,7 @@ export const mapToResult = (
   if (defaultSearchField === undefined || getInAppUrl === undefined) {
     throw new Error('Trying to map an object from a type without management metadata');
   }
+
   return {
     id: object.id,
     // defaultSearchField is dynamic and not 'directly' bound to the generic type of the SavedObject
@@ -53,5 +54,6 @@ export const mapToResult = (
     icon: type.management?.icon ?? undefined,
     url: getInAppUrl(object).path,
     score: object.score,
+    tags: object.references.filter((ref) => ref.type === 'tag').map(({ id }) => id),
   };
 };

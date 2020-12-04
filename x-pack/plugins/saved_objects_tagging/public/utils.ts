@@ -40,6 +40,10 @@ export const convertTagNameToId = (tagName: string, allTags: Tag[]): string | un
   return found?.id;
 };
 
+export const getTag = (tagId: string, allTags: Tag[]): Tag | undefined => {
+  return allTags.find(({ id }) => id === tagId);
+};
+
 export const byNameTagSorter = (tagA: Tag, tagB: Tag): number => {
   return tagA.name.localeCompare(tagB.name);
 };
