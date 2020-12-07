@@ -22,7 +22,7 @@ import { METRIC_TYPE, UiCounterMetricType } from '@kbn/analytics';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { ApplicationStart } from 'kibana/public';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useRef, useState } from 'react';
 import useDebounce from 'react-use/lib/useDebounce';
 import useEvent from 'react-use/lib/useEvent';
 import useMountedState from 'react-use/lib/useMountedState';
@@ -75,7 +75,8 @@ const resultToOption = (
   result: GlobalSearchResult,
   getTag?: SavedObjectTaggingPluginStart['ui']['getTag']
 ): EuiSelectableTemplateSitewideOption => {
-  const { id, title, url, icon, type, meta, tags = [] } = result;
+  const { id, title, url, icon, type, meta = {} } = result;
+  const { tagIds = [], categoryLabel = '' } = meta as { tagIds: string[]; categoryLabel: string };
   // only displaying icons for applications
   const useIcon = type === 'application';
   const option: EuiSelectableTemplateSitewideOption = {
@@ -88,14 +89,16 @@ const resultToOption = (
   };
 
   if (type === 'application') {
-    option.meta = [{ text: (meta?.categoryLabel as string) ?? '' }];
+    option.meta = [{ text: categoryLabel }];
   } else {
     option.meta = [{ text: cleanMeta(type) }];
   }
 
-  if (getTag && tags.length) {
-    const tagBadges = tags.map((tag) => {
+  if (getTag && tagIds.length) {
+    // TODO #85189 - refactor to use TagList instead of getTag
+    const tagBadges = tagIds.map((tag) => {
       const { color, name, id: tagId } = getTag(tag)!;
+
       return (
         <EuiBadge color={color} key={tagId}>
           {name}
@@ -103,7 +106,16 @@ const resultToOption = (
       );
     });
 
-    option.append = <ul style={{ display: 'inline' }}>{tagBadges}</ul>;
+    option.append = (
+      <ul
+        aria-label={i18n.translate('xpack.globalSearchBar.searchBar.optionTagListAriaLabel', {
+          defaultMessage: 'Tags',
+        })}
+        style={{ display: 'inline' }}
+      >
+        {tagBadges}
+      </ul>
+    );
   }
 
   return option;

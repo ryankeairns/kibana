@@ -63,8 +63,6 @@ export interface GlobalSearchProviderResult {
   score: number;
   /** an optional record of metadata for this result */
   meta?: Record<string, Serializable>;
-  /** an array of tag IDs associated with this result */
-  tags: string[];
 }
 
 /**
