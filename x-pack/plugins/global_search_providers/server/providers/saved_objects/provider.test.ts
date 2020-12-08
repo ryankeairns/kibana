@@ -195,18 +195,22 @@ describe('savedObjectsResultProvider', () => {
     const results = await provider.find({ term: 'term' }, defaultOption, context).toPromise();
     expect(results).toEqual([
       {
+        icon: undefined,
         id: 'resultA',
         title: 'titleA',
         type: 'typeA',
         url: '/type-a/resultA',
         score: 50,
+        meta: { tagIds: [] },
       },
       {
+        icon: undefined,
         id: 'resultB',
         title: 'titleB',
         type: 'typeB',
         url: '/type-b/resultB',
         score: 78,
+        meta: { tagIds: [] },
       },
     ]);
   });
