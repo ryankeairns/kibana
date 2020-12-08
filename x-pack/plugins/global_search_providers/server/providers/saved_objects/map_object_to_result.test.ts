@@ -65,6 +65,7 @@ describe('mapToResult', () => {
       url: '/dashboard/dash1',
       icon: 'dashboardApp',
       score: 42,
+      meta: { tagIds: [] },
     });
   });
 
