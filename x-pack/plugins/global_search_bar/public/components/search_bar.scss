@@ -1,10 +1,17 @@
 .kbnSearchOption__tagsList {
-  display: inline;
+  display: inline-block; // Horizontally aligns the tag list to the 'Go to' badge when row is focused
+  line-height: $euiFontSizeM !important;
 
-  .euiBadge__text {
-    max-width: 100px;
-    text-overflow: ellipsis;
+  .kbnSearchOption__tagsListItem {
+    display: inline-block;
+    max-width: 80px;
+    margin-right: $euiSizeS;
   }
+}
+
+.euiSelectableListItem-isFocused .kbnSearchOption__tagsList {
+  margin-right: $euiSizeXS;
+  border-right: $euiBorderThin; // Adds divider between the tag list and 'Go to' badge
 }
 
 //TODO add these overrides to EUI so that search behaves the same globally

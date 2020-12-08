@@ -101,9 +101,11 @@ const resultToOption = (
       const { color, name, id: tagId } = getTag(tag)!;
 
       return (
-        <EuiBadge color={color} key={tagId}>
-          {name}
-        </EuiBadge>
+        <li className="kbnSearchOption__tagsListItem">
+          <EuiBadge color={color} key={tagId}>
+            {name}
+          </EuiBadge>
+        </li>
       );
     });
 
