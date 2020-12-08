@@ -109,10 +109,10 @@ const resultToOption = (
 
     option.append = (
       <ul
+        className="kbnSearchOption__tagsList"
         aria-label={i18n.translate('xpack.globalSearchBar.searchBar.optionTagListAriaLabel', {
           defaultMessage: 'Tags',
         })}
-        style={{ display: 'inline' }}
       >
         {tagBadges}
       </ul>
