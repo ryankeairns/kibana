@@ -216,25 +216,31 @@ describe('mapToResults', () => {
 
     expect(mapToResults(results, typeRegistry, capabilities)).toEqual([
       {
+        icon: undefined,
         id: 'resultA',
         title: 'titleA',
         type: 'typeA',
         url: '/type-a/resultA',
         score: 100,
+        meta: { tagIds: [] },
       },
       {
+        icon: undefined,
         id: 'resultC',
         title: 'titleC',
         type: 'typeC',
         url: '/type-c/resultC',
         score: 42,
+        meta: { tagIds: [] },
       },
       {
+        icon: undefined,
         id: 'resultB',
         title: 'titleB',
         type: 'typeB',
         url: '/type-b/resultB',
         score: 69,
+        meta: { tagIds: [] },
       },
     ]);
   });
@@ -267,11 +273,13 @@ describe('mapToResults', () => {
 
     expect(mapToResults(results, typeRegistry, capabilities)).toEqual([
       {
+        icon: undefined,
         id: 'resultA',
         title: 'titleA',
         type: 'typeA',
         url: '/type-a/resultA',
         score: 100,
+        meta: { tagIds: [] },
       },
     ]);
   });
