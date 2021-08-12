@@ -82,7 +82,7 @@ export const Overview: FC<Props> = ({ newsFetchResult, solutions, features }) =>
         recommended: false,
       },
     },
-    docsLink: 'https://elastic.co',
+    docsLink: 'https://www.elastic.co/kibana/',
   };
 
   // Show card for console if none of the manage data plugins are available, most likely in OSS
