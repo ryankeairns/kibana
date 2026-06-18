@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { FormattedMessage } from '@kbn/i18n-react';
-import { EuiCallOut, EuiLink, useIsWithinMinBreakpoint } from '@elastic/eui';
+import { EuiCallOut, EuiLink } from '@elastic/eui';
 
 import type { AppHeaderBadge } from '@kbn/app-header';
 import { AppHeader, type AppHeaderTab } from '@kbn/app-header';
@@ -49,9 +49,6 @@ export const DefaultLayout: React.FunctionComponent<Props> = ({
   const { docLinks } = useStartServices();
   const granularPrivilegesCallout = useDismissableTour('GRANULAR_PRIVILEGES');
   const canEnableAutomaticAgentUpgrades = useCanEnableAutomaticAgentUpgrades();
-
-  const isBiggerScreen = useIsWithinMinBreakpoint('xxl');
-  const contentWidth = section === 'settings' && isBiggerScreen ? '80%' : '100%';
 
   const readOnlyBySection: Record<string, boolean> = {
     agents: !authz.fleet.allAgents,
@@ -179,7 +176,7 @@ export const DefaultLayout: React.FunctionComponent<Props> = ({
         docLink={docLinks.links.fleet.guide}
         badges={badges}
       />
-      <WithoutHeaderLayout restrictWidth={contentWidth}>
+      <WithoutHeaderLayout restrictWidth={false}>
         {rightColumn}
         {children}
       </WithoutHeaderLayout>

@@ -26,18 +26,18 @@ export const Page = styled(EuiPage)`
 
 export const ContentWrapper = styled.div`
   height: 100%;
-  padding-left: ${(props) => props.theme.eui.euiSizeM};
-  padding-right: ${(props) => props.theme.eui.euiSizeM};
+  padding-left: ${(props) => props.theme.eui.euiSize};
+  padding-right: ${(props) => props.theme.eui.euiSize};
 `;
 
 interface Props {
-  restrictWidth?: number | string;
+  restrictWidth?: number | string | boolean;
   children?: React.ReactNode;
 }
 
-export const WithoutHeaderLayout: React.FC<Props> = ({ restrictWidth, children }) => (
+export const WithoutHeaderLayout: React.FC<Props> = ({ restrictWidth = 1200, children }) => (
   <Wrapper>
-    <Page restrictWidth={restrictWidth || 1200}>
+    <Page restrictWidth={restrictWidth}>
       <EuiPageBody>
         <ContentWrapper>
           <EuiSpacer size="m" />
